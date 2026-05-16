@@ -49,6 +49,24 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 ---
 
+
+
+
+![alt text](static/image.png)
+
+
+![alt text](static/image1.png)
+
+
+![alt text](static/image2.png)
+
+
+![alt text](static/image4.png)
+
+
+
+
+
 ## ✨ Features
 
 ### AI Chat Agent (Aria)
@@ -136,6 +154,10 @@ cd frontend && python -m http.server 3000
 ```
 
 ---
+
+
+
+
 
 ## 🌐 Service URLs
 
