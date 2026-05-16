@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+env/
+
+# Logs
+logs/
+*.log
+
+# n8n data (contains credentials)
+.n8n/
+
+# ngrok config (contains auth token)
+ngrok.yml
+ngrok.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Sensitive — NEVER commit these
+*.env
+secrets.txt
+credentials.json

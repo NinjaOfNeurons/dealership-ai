@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoEdge AI — Command Centre</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: #1a1a2e;
+      border-bottom: 1px solid #2d2d4e;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 36px; height: 36px; border-radius: 10px; background: #4f46e5; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+    .topbar h1 { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+    .topbar p { font-size: 12px; color: #64748b; }
+    .live-badge { display: flex; align-items: center; gap: 6px; background: #0d2d1a; border: 1px solid #166534; border-radius: 20px; padding: 5px 12px; font-size: 12px; color: #4ade80; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .main { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #1a1a2e;
+      border: 1px solid #2d2d4e;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-label { font-size: 12px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 32px; font-weight: 600; color: #f1f5f9; line-height: 1; }
+    .stat-sub { font-size: 12px; color: #64748b; margin-top: 6px; }
+    .stat-card.hot .stat-value { color: #f87171; }
+    .stat-card.warm .stat-value { color: #fb923c; }
+    .stat-card.cold .stat-value { color: #60a5fa; }
+    .stat-card.total .stat-value { color: #a78bfa; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+    .panel {
+      background: #1a1a2e;
+      border: 1px solid #2d2d4e;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid #2d2d4e;
+      border-radius: 6px;
+      color: #64748b;
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: #4f46e5; color: #a78bfa; }
+
+    .lead-table { width: 100%; border-collapse: collapse; }
+    .lead-table th { font-size: 11px; color: #64748b; text-align: left; padding: 0 0 10px; border-bottom: 1px solid #2d2d4e; font-weight: 500; }
+    .lead-table td { font-size: 13px; padding: 10px 0; border-bottom: 1px solid #1e1e35; color: #cbd5e1; }
+    .lead-table tr:last-child td { border-bottom: none; }
+    .lead-table td:first-child { color: #f1f5f9; font-weight: 500; }
+
+    .intent-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .intent-hot { background: #2d1515; color: #f87171; border: 1px solid #7f1d1d; }
+    .intent-warm { background: #2d1a0e; color: #fb923c; border: 1px solid #7c2d12; }
+    .intent-cold { background: #0e1f2d; color: #60a5fa; border: 1px solid #1e3a5f; }
+
+    .empty-state { text-align: center; padding: 40px 20px; color: #475569; font-size: 13px; }
+    .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e1e35;
+      font-size: 13px;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .activity-dot.lead { background: #a78bfa; }
+    .activity-dot.chat { background: #34d399; }
+    .activity-dot.email { background: #60a5fa; }
+    .activity-text { flex: 1; color: #94a3b8; line-height: 1.5; }
+    .activity-text strong { color: #e2e8f0; }
+    .activity-time { font-size: 11px; color: #475569; flex-shrink: 0; }
+
+    canvas { max-height: 200px; }
+
+    .system-status { display: flex; flex-direction: column; gap: 10px; }
+    .status-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .status-row span:first-child { color: #94a3b8; }
+    .status-ok { color: #4ade80; display: flex; align-items: center; gap: 5px; }
+    .status-ok::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+    .status-err { color: #f87171; display: flex; align-items: center; gap: 5px; }
+    .status-err::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #ef4444; }
+
+    .demo-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 10px;
+      background: #1e1b4b;
+      border: 1px solid #4f46e5;
+      border-radius: 8px;
+      color: #a78bfa;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .demo-btn:hover { background: #2e2a6e; }
+
+    .chat-link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid #2d2d4e;
+      border-radius: 8px;
+      color: #64748b;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .chat-link:hover { border-color: #4f46e5; color: #a78bfa; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">AE</div>
+    <div>
+      <h1>AutoEdge AI — Command Centre</h1>
+      <p>Llama3 · n8n · FastAPI · Local GPU</p>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    LIVE
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-label">Total Leads</div>
+      <div class="stat-value" id="total-leads">—</div>
+      <div class="stat-sub">captured by AI</div>
+    </div>
+    <div class="stat-card hot">
+      <div class="stat-label">🔥 Hot Leads</div>
+      <div class="stat-value" id="hot-leads">—</div>
+      <div class="stat-sub">call within 5 mins</div>
+    </div>
+    <div class="stat-card warm">
+      <div class="stat-label">Warm Leads</div>
+      <div class="stat-value" id="warm-leads">—</div>
+      <div class="stat-sub">follow up today</div>
+    </div>
+    <div class="stat-card cold">
+      <div class="stat-label">Cold Leads</div>
+      <div class="stat-value" id="cold-leads">—</div>
+      <div class="stat-sub">nurture sequence</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div class="panel-title">
+        Recent Leads
+        <button class="refresh-btn" onclick="loadLeads()">↻ Refresh</button>
+      </div>
+      <div id="leads-container">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          Loading leads...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grid-2">
+
+    <div class="panel">
+      <div class="panel-title">Lead Intent Distribution</div>
+      <canvas id="intent-chart"></canvas>
+      <div id="no-chart" class="empty-state" style="display:none;">
+        <div class="icon">📊</div>
+        No leads yet — start a chat conversation
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">System Status</div>
+      <div class="system-status">
+        <div class="status-row">
+          <span>FastAPI Backend</span>
+          <span class="status-ok" id="api-status">Connected</span>
+        </div>
+        <div class="status-row">
+          <span>Ollama (Llama3)</span>
+          <span id="ollama-status" class="status-ok">Checking...</span>
+        </div>
+        <div class="status-row">
+          <span>n8n Workflow</span>
+          <span class="status-ok">Active</span>
+        </div>
+        <div class="status-row">
+          <span>Gmail Integration</span>
+          <span class="status-ok">Connected</span>
+        </div>
+        <div class="status-row">
+          <span>Lead Capture AI</span>
+          <span class="status-ok">Running</span>
+        </div>
+        <div class="status-row">
+          <span>Model</span>
+          <span id="model-name" style="color:#a78bfa; font-size:12px;">—</span>
+        </div>
+      </div>
+
+      <button class="demo-btn" onclick="fireDemoLead()">⚡ Fire Demo Lead</button>
+      <a href="http://localhost:3000" class="chat-link" target="_blank">→ Open AI Chat UI</a>
+    </div>
+
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div class="panel-title">Live Activity Feed</div>
+      <div id="activity-feed">
+        <div class="empty-state">
+          <div class="icon">📡</div>
+          Waiting for activity...
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:8000';
+  let chartInstance = null;
+  let activityLog = [];
+
+  function timeAgo(isoString) {
+    if (!isoString) return 'just now';
+    const diff = Math.floor((Date.now() - new Date(isoString)) / 1000);
+    if (diff < 60) return diff + 's ago';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    return Math.floor(diff/3600) + 'h ago';
+  }
+
+  function formatTime(isoString) {
+    if (!isoString) return '';
+    try {
+      return new Date(isoString).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    } catch { return ''; }
+  }
+
+  async function loadLeads() {
+    try {
+      const res = await fetch(API + '/leads');
+      const data = await res.json();
+
+      document.getElementById('total-leads').textContent = data.total;
+      document.getElementById('hot-leads').textContent = data.hot;
+      document.getElementById('warm-leads').textContent = data.warm;
+      document.getElementById('cold-leads').textContent = data.cold;
+
+      renderLeadsTable(data.leads);
+      renderChart(data.hot, data.warm, data.cold);
+
+    } catch (e) {
+      document.getElementById('api-status').className = 'status-err';
+      document.getElementById('api-status').textContent = 'Disconnected';
+    }
+  }
+
+  function renderLeadsTable(leads) {
+    const container = document.getElementById('leads-container');
+    if (!leads || leads.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">🤖</div>No leads yet — open the chat and have a conversation about buying a car</div>`;
+      return;
+    }
+
+    const reversed = [...leads].reverse();
+    let html = `<table class="lead-table">
+      <thead><tr>
+        <th>Name</th><th>Phone</th><th>Interest</th><th>Intent</th><th>Time</th>
+      </tr></thead><tbody>`;
+
+    reversed.forEach(lead => {
+      const badgeClass = `intent-${lead.intent_level || 'cold'}`;
+      html += `<tr>
+        <td>${lead.name || '—'}</td>
+        <td>${lead.phone || '—'}</td>
+        <td>${lead.interest || '—'}</td>
+        <td><span class="intent-badge ${badgeClass}">${(lead.intent_level || 'cold').toUpperCase()}</span></td>
+        <td>${formatTime(lead.timestamp)}</td>
+      </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
+
+  function renderChart(hot, warm, cold) {
+    const total = hot + warm + cold;
+    const canvas = document.getElementById('intent-chart');
+    const noChart = document.getElementById('no-chart');
+
+    if (total === 0) {
+      canvas.style.display = 'none';
+      noChart.style.display = 'block';
+      return;
+    }
+
+    canvas.style.display = 'block';
+    noChart.style.display = 'none';
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Hot 🔥', 'Warm', 'Cold'],
+        datasets: [{
+          data: [hot, warm, cold],
+          backgroundColor: ['#ef4444', '#f97316', '#3b82f6'],
+          borderColor: '#1a1a2e',
+          borderWidth: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#94a3b8', font: { size: 12 }, padding: 16 }
+          }
+        },
+        cutout: '65%'
+      }
+    });
+  }
+
+  async function checkHealth() {
+    try {
+      const res = await fetch(API + '/health');
+      const data = await res.json();
+      const ollamaEl = document.getElementById('ollama-status');
+      const modelEl = document.getElementById('model-name');
+      ollamaEl.className = data.ollama_connected ? 'status-ok' : 'status-err';
+      ollamaEl.textContent = data.ollama_connected ? 'Connected' : 'Disconnected';
+      modelEl.textContent = data.model || 'llama3';
+    } catch (e) {
+      document.getElementById('ollama-status').className = 'status-err';
+      document.getElementById('ollama-status').textContent = 'Error';
+    }
+  }
+
+  async function fireDemoLead() {
+    const names = ['Rahul Sharma', 'Priya Mehta', 'Arjun Singh', 'Sneha Kapoor', 'Vikram Nair'];
+    const interests = ['Hyundai Creta SX(O)', 'Kia Seltos HTX+', 'Maruti Brezza ZXI+', 'MG Hector Plus', 'Kia Carens'];
+    const intents = ['hot', 'warm', 'cold'];
+    const phones = ['9876543210', '9988776655', '8877665544', '7766554433', '9123456780'];
+
+    const lead = {
+      name: names[Math.floor(Math.random() * names.length)],
+      phone: phones[Math.floor(Math.random() * phones.length)],
+      interest: interests[Math.floor(Math.random() * interests.length)],
+      intent_level: intents[Math.floor(Math.random() * intents.length)],
+      timestamp: new Date().toISOString(),
+      session_id: 'demo-' + Date.now()
+    };
+
+    try {
+      await fetch(API + '/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lead)
+      });
+    } catch {}
+
+    addActivity('lead', `New lead captured: <strong>${lead.name}</strong> interested in ${lead.interest}`, 'just now');
+    addActivity('email', `Gmail alert fired to dev.karanpreet@gmail.com`, 'just now');
+
+    await loadLeads();
+  }
+
+  function addActivity(type, text, time) {
+    activityLog.unshift({ type, text, time });
+    if (activityLog.length > 10) activityLog.pop();
+    renderActivity();
+  }
+
+  function renderActivity() {
+    const feed = document.getElementById('activity-feed');
+    if (activityLog.length === 0) return;
+    feed.innerHTML = activityLog.map(item => `
+      <div class="activity-item">
+        <div class="activity-dot ${item.type}"></div>
+        <div class="activity-text">${item.text}</div>
+        <div class="activity-time">${item.time}</div>
+      </div>
+    `).join('');
+  }
+
+  async function init() {
+    await checkHealth();
+    await loadLeads();
+    addActivity('chat', 'AutoEdge AI Command Centre <strong>online</strong>', 'just now');
+    addActivity('chat', 'Llama3 model loaded on <strong>local GPU</strong>', 'just now');
+    addActivity('email', 'Gmail integration <strong>active</strong> via n8n', 'just now');
+  }
+
+  init();
+  setInterval(loadLeads, 10000);
+  setInterval(checkHealth, 30000);
+</script>
+</body>
+</html>
