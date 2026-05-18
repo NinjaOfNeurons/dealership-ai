@@ -6,7 +6,7 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 ---
 
-## 🎯 What This Demonstrates
+##  What This Demonstrates
 
 | Skill | Implementation |
 |---|---|
@@ -22,7 +22,7 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/f202da76-74f6-4edd-8477-8163c13715b7" />
 
@@ -42,7 +42,7 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 
 
-## ✨ Features
+## Features
 
 ### AI Chat Agent (Aria)
 - Answers inventory queries across 10+ car models
@@ -206,7 +206,7 @@ MODEL = "llama3"  # or "mistral", "llama3.1", etc.
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 dealership-ai/
@@ -223,7 +223,7 @@ dealership-ai/
 
 ---
 
-## 🗺️ Roadmap / Production Extensions
+##  Roadmap / Production Extensions
 
 - [ ] PostgreSQL for persistent lead storage
 - [ ] HubSpot CRM native integration
@@ -236,7 +236,7 @@ dealership-ai/
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **LLM**: Llama3 8B via Ollama
 - **Backend**: FastAPI, Python 3.11, httpx
@@ -249,6 +249,6 @@ dealership-ai/
 
 ---
 
-## 👤 Author
+##  Author
 
 Built by Karanpreet Singh as an AI Automation & Integration POC.
