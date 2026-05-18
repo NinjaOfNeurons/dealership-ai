@@ -24,28 +24,7 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   Customer Layer                     │
-│         Chat UI (port 3000) │ Voice (VAPI)          │
-└──────────────────┬──────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────┐
-│              FastAPI Backend (port 8000)             │
-│  /chat  │  /vapi/chat/completions  │  /leads        │
-│              Llama3 via Ollama (local GPU)           │
-└──────────────────┬──────────────────────────────────┘
-                   │ Lead detected
-┌──────────────────▼──────────────────────────────────┐
-│                 n8n Workflow Engine                  │
-│         Webhook → Gmail │ HubSpot │ WhatsApp        │
-└─────────────────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────┐
-│            Dashboard (port 3002)                    │
-│     Live leads, intent chart, system status        │
-└─────────────────────────────────────────────────────┘
-```
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/f202da76-74f6-4edd-8477-8163c13715b7" />
 
 ---
 
