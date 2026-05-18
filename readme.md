@@ -31,16 +31,12 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 
 
 
-![alt text](static/image.png)
 
 
-![alt text](static/image1.png)
 
 
-![alt text](static/image2.png)
 
 
-![alt text](static/image4.png)
 
 
 
@@ -55,16 +51,30 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 - Speaks Hindi and English
 - Voice input via Web Speech API (Chrome)
 
+![alt text](static/image.png)
+
+
 ### Automatic Lead Capture
 - AI detects buying intent mid-conversation
 - Extracts name, phone, interest, intent level (hot/warm/cold)
 - Hidden `<LEAD_CAPTURE>` tag — invisible to customer
 - Fires to n8n webhook instantly
 
+![alt text](static/image4.png)
+
+
+---
+
 ### n8n Automation Pipeline
 - Webhook receives lead data
 - Gmail alert fires within seconds
 - Same pipeline connects to HubSpot, WhatsApp, Slack
+
+![alt text](static/image1.png)
+
+
+---
+
 
 ### Voice AI (VAPI)
 - Inbound call handler powered by local Llama3
@@ -72,12 +82,16 @@ A fully local, GPU-powered AI automation stack for automotive dealerships. Built
 - Voice-optimised responses (short, natural, question-ended)
 - Lead capture works on calls too
 
+---
+
 ### Real-time Dashboard
 - Live lead count (hot / warm / cold)
 - Intent distribution donut chart
 - System status (Ollama, n8n, Gmail)
 - Auto-refreshes every 10 seconds
 - One-click demo lead generator
+![alt text](static/image2.png)
+
 
 ---
 
