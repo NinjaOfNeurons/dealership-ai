@@ -1,4 +1,4 @@
-# 🚗 AutoEdge AI — Dealership Automation System
+#  AutoEdge AI — Dealership Automation System
 
 A fully local, GPU-powered AI automation stack for automotive dealerships. Built as a proof-of-concept demonstrating end-to-end AI integration across chat, voice, lead capture, workflow automation, and real-time dashboards.
 
